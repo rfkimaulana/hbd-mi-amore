@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Untuk Kamu 💌</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <script>
+    /* =====================================================================
+       ✏️  ISI DATA DI SINI — cukup ubah bagian CONFIG ini saja
+       ===================================================================== */
+    const CONFIG = {
+      nama: "Sierra Antonio",           // nama dia
+      panggilan: "mi amore",            // panggilan sayang
+      dari: "Geo",                      // namamu / panggilanmu dari dia
+      ultahKe: 23,                      // ulang tahun ke-berapa
+      jumlahLilin: 5,                   // jumlah lilin di kue
+      tanggalJadian: "2026-08-17",      // format YYYY-MM-DD
+
+      // Password pembuka (opsional). Kosongkan "" kalau tidak mau pakai password.
+      password: "kadalhitam16",
+      petunjukPassword: "nama kuda + warna fav geo + ulang tahun geo (huruf kecil semua)",
+
+      // Lagu (opsional): taruh file mp3 di folder yang sama, misal "lagu.mp3". Kosongkan "" kalau tidak ada.
+      lagu: "lagu.mp3",
+
+      // Timeline kenangan — foto taruh di folder "foto/". Kosongkan foto: "" kalau tidak ada.
+      kenangan: [
+        { judul: "Berdua di Tepi Laut", cerita: "Malam berbadai, satu kuda, dua penunggang. Ombak boleh ribut, yang penting kamu pegangan di belakang aku.", foto: "foto/pantai.jpg" },
+        { judul: "Dermaga Blackwater", cerita: "Duduk di ujung dermaga, lampu kota di belakang, kepala kamu nyender di bahu aku. Nggak perlu banyak omong.", foto: "foto/dermaga.jpg" },
+        { judul: "Di Atas Salju", cerita: "Naik sampai puncak gunung bersalju cuma buat lihat bintang bareng kamu. Dingin, tapi worth it.", foto: "foto/gunung.jpg" },
+        { judul: "Sepasang Outlaw", cerita: "Jalan berdua di Blackwater, kompak kayak partner in crime. Siapa pun yang lewat tahu kita satu geng.", foto: "foto/blackwater.jpg" },
+        { judul: "Senja Paling Indah", cerita: "Gandengan tangan lihat matahari tenggelam di danau. Kalau bisa, aku mau berhenti di momen ini selamanya.", foto: "foto/sunset.jpg" },
+        { judul: "Jalan-jalan ke Kota", cerita: "Topi koboi, jaket kulit, senyum tipis kamu. Cowboy di sebelah kamu ini beruntung banget.", foto: "foto/kota.jpg" },
+        { judul: "Malam di Saloon", cerita: "Duduk berdua di saloon, dunia ramai di sekitar, tapi mata aku cuma ke kamu.", foto: "foto/saloon.jpg" },
+      ],
+
+      // Hal-hal yang kamu suka dari dia (bisa berapa saja)
+      alasan: [
+        "Tatapan kamu yang bikin cowboy ini luluh",
+        "Kamu selalu ikut kemana pun aku pergi, dari pantai sampai gunung salju",
+        "Gaya koboi kamu yang paling cantik se-Blackwater",
+        "Kamu tempat aku pulang setelah hari yang panjang",
+        "Senyum kamu pas kita lihat senja bareng",
+        "Karena kamu, mi amore. Udah, itu aja cukup.",
+      ],
+
+      // Surat utama — tulis bebas, enter = baris baru
+      surat: `Selamat ulang tahun yang ke-23, mi amore.
+
+Di dunia yang keras, penuh debu, peluru, dan orang-orang yang nggak bisa dipercaya, kamu jadi hal paling tenang yang pernah aku punya. Dari malam berbadai di pantai, duduk berdua di dermaga Blackwater, sampai lihat bintang di puncak gunung salju, semuanya jadi berarti karena ada kamu di sebelah aku.
+
+Makasih udah mau jalan bareng aku, ikut ke mana pun kuda ini bawa kita. Semoga tahun ini semua yang kamu harapkan tercapai, dan jalan kamu selalu dimudahkan.
+
+Terima kasih udah jadi kamu, Sierra.`,
+
+      penutup: "Selama matahari masih tenggelam di ujung danau, aku bakal tetap di sebelah kamu. Te amo, mi amore.",
+    };
+    /* ===================================================================== */
+  </script>
+  <style>
+    :root {
+      --bg: #1a0f22;
+      --bg2: #2b1538;
+      --pink: #ff9cbc;
+      --rose: #e8588a;
+      --gold: #ffd98e;
+      --cream: #fff7ee;
+      --ink: #43293a;
+      --text: #fdebf3;
+      --muted: #cfaec0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      background: radial-gradient(ellipse at 50% 0%, #40204d 0%, var(--bg) 65%);
+      color: var(--text);
+      font-family: Quicksand, system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    .scene > :first-child {
+      margin-top: auto
+    }
+
+    .scene > :last-child {
+      margin-bottom: auto
+    }
+
+    #stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0
+    }
+
+    #stars span {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: #fff;
+      opacity: .2;
+      animation: twinkle 3s ease-in-out infinite
+    }
+
+    @keyframes twinkle {
+      50% {
+        opacity: .9
+      }
+    }
+
+    #fx {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 50
+    }
+
+    .scene {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 22px;
+      padding: 32px 16px;
+      text-align: center;
+      overflow-y: auto;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(.98);
+      transition: opacity .9s, visibility .9s, transform .9s;
+    }
+
+    .scene.active {
+      opacity: 1;
+      visibility: visible;
+      transform: none
+    }
+
+    .scene.scroll {
+      justify-content: flex-start;
+      padding-top: 48px;
+      padding-bottom: 64px
+    }
+
+    .script {
+      font-family: "Dancing Script", cursive;
+      font-weight: 700;
+      line-height: 1.15
+    }
+
+    h1.script {
+      font-size: clamp(2.4rem, 9vw, 4rem);
+      color: var(--pink);
+      text-shadow: 0 0 24px rgba(255, 156, 188, .35)
+    }
+
+    h2.script {
+      font-size: clamp(2rem, 7vw, 3rem);
+      color: var(--pink)
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 460px;
+      line-height: 1.6
+    }
+
+    .btn {
+      font: 700 1rem Quicksand, sans-serif;
+      color: #2a1020;
+      background: linear-gradient(135deg, var(--pink), var(--gold));
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 30px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(232, 88, 138, .35);
+      transition: transform .2s;
+    }
+
+    .btn:active {
+      transform: scale(.95)
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--pink);
+      border: 1.5px solid var(--pink);
+      box-shadow: none
+    }
+
+    .hidden {
+      display: none !important
+    }
+
+    .fade-in {
+      animation: fadeUp .9s both
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    /* ---------- lock ---------- */
+    .lock-box {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+      width: 100%;
+      max-width: 320px
+    }
+
+    .lock-box input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(255, 156, 188, .4);
+      background: rgba(255, 255, 255, .06);
+      color: var(--text);
+      font: 500 1.1rem Quicksand;
+      text-align: center;
+      letter-spacing: .15em;
+      outline: none;
+    }
+
+    .lock-box input:focus {
+      border-color: var(--pink)
+    }
+
+    .shake {
+      animation: shake .4s
+    }
+
+    @keyframes shake {
+      25% {
+        transform: translateX(-8px)
+      }
+
+      75% {
+        transform: translateX(8px)
+      }
+    }
+
+    /* ---------- envelope ---------- */
+    .envelope {
+      position: relative;
+      width: 280px;
+      height: 180px;
+      cursor: pointer;
+      margin-top: 90px;
+      animation: bob 3s ease-in-out infinite
+    }
+
+    .envelope.open {
+      animation: none
+    }
+
+    @keyframes bob {
+      50% {
+        transform: translateY(-8px)
+      }
+    }
+
+    .env-back {
+      position: absolute;
+      inset: 0;
+      background: #d9849e;
+      border-radius: 8px
+    }
+
+    .env-letter {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      top: 10px;
+      height: 160px;
+      background: var(--cream);
+      border-radius: 6px;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+      transition: transform 1s .5s;
+      font-family: "Dancing Script";
+      font-size: 1.6rem;
+      padding: 10px;
+    }
+
+    .envelope.open .env-letter {
+      transform: translateY(-110px)
+    }
+
+    .env-pocket {
+      position: absolute;
+      inset: 0;
+      background: #f4b3c6;
+      border-radius: 8px;
+      z-index: 2;
+      clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%)
+    }
+
+    .env-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 110px;
+      background: #e993ad;
+      z-index: 3;
+      border-radius: 8px 8px 0 0;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transform-origin: top;
+      transition: transform .6s, z-index 0s .3s;
+    }
+
+    .envelope.open .env-flap {
+      transform: rotateX(180deg);
+      z-index: 0
+    }
+
+    .env-seal {
+      position: absolute;
+      left: 50%;
+      top: 88px;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      font-size: 2rem;
+      transition: opacity .3s
+    }
+
+    .envelope.open .env-seal {
+      opacity: 0
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: .9rem;
+      animation: pulse 2s infinite
+    }
+
+    @keyframes pulse {
+      50% {
+        opacity: .4
+      }
+    }
+
+    /* ---------- cake ---------- */
+    .cake-wrap {
+      position: relative;
+      width: 260px;
+      height: 230px;
+      margin-top: 10px
+    }
+
+    .plate {
+      position: absolute;
+      bottom: 0;
+      left: -10px;
+      right: -10px;
+      height: 16px;
+      border-radius: 50%;
+      background: #eee;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .4)
+    }
+
+    .layer {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 14px
+    }
+
+    .layer.l1 {
+      bottom: 8px;
+      width: 240px;
+      height: 80px;
+      background: linear-gradient(#f7a8c0, #e8779b)
+    }
+
+    .layer.l2 {
+      bottom: 80px;
+      width: 190px;
+      height: 64px;
+      background: linear-gradient(#fff1e0, #f6d8bd)
+    }
+
+    .drip {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 22px;
+      border-radius: 14px 14px 0 0;
+      background: radial-gradient(circle at 10px 18px, transparent 0 0), #fff;
+      opacity: .9;
+      -webkit-mask: radial-gradient(circle 11px at 50% 100%, #000 98%, transparent) 0 0/22px 30px repeat-x, linear-gradient(#000, #000) 0 0/100% 12px no-repeat;
+      mask: radial-gradient(circle 11px at 50% 100%, #000 98%, transparent) 0 0/22px 30px repeat-x, linear-gradient(#000, #000) 0 0/100% 12px no-repeat;
+    }
+
+    .l1 .drip {
+      background: #fff7ee
+    }
+
+    .l2 .drip {
+      background: #ff9cbc
+    }
+
+    .candles {
+      position: absolute;
+      bottom: 144px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 18px
+    }
+
+    .candle {
+      position: relative;
+      width: 10px;
+      height: 44px;
+      border-radius: 3px;
+      cursor: pointer;
+      background: repeating-linear-gradient(135deg, #fff 0 6px, #ff9cbc 6px 12px)
+    }
+
+    .flame {
+      position: absolute;
+      left: 50%;
+      top: -26px;
+      width: 14px;
+      height: 24px;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse at 50% 70%, #fff 0 20%, var(--gold) 40%, #ff8a3d 70%, transparent 72%);
+      border-radius: 50% 50% 50% 50%/60% 60% 40% 40%;
+      filter: drop-shadow(0 0 10px #ffb347);
+      animation: flicker .15s infinite alternate;
+      transition: opacity .3s
+    }
+
+    @keyframes flicker {
+      to {
+        transform: translateX(-50%) scale(1.06, .94) rotate(2deg)
+      }
+    }
+
+    .candle.out .flame {
+      opacity: 0
+    }
+
+    .smoke {
+      position: absolute;
+      left: 50%;
+      top: -20px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(220, 220, 220, .5);
+      opacity: 0
+    }
+
+    .candle.out .smoke {
+      animation: smoke 1.6s ease-out
+    }
+
+    @keyframes smoke {
+      0% {
+        opacity: .8;
+        transform: translate(-50%, 0) scale(1)
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-30%, -60px) scale(3)
+      }
+    }
+
+    /* ---------- counter ---------- */
+    .counter {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 440px
+    }
+
+    .counter div {
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 156, 188, .25);
+      border-radius: 16px;
+      padding: 14px 4px
+    }
+
+    .counter b {
+      display: block;
+      font-size: clamp(1.4rem, 6vw, 2.1rem);
+      color: var(--gold);
+      font-variant-numeric: tabular-nums
+    }
+
+    .counter small {
+      color: var(--muted);
+      font-size: .78rem
+    }
+
+    /* ---------- timeline ---------- */
+    .timeline {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      padding-left: 22px;
+      text-align: left;
+      flex-shrink: 0
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(var(--pink), transparent)
+    }
+
+    .memory {
+      position: relative;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 156, 188, .2);
+      border-radius: 18px;
+      overflow: hidden;
+      flex-shrink: 0;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .8s, transform .8s
+    }
+
+    .memory.show {
+      opacity: 1;
+      transform: none
+    }
+
+    .memory::before {
+      content: "💗";
+      position: absolute;
+      left: -26px;
+      top: 14px;
+      font-size: .9rem
+    }
+
+    .memory {
+      overflow: visible
+    }
+
+    .memory .photo {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 18px 18px 0 0
+    }
+
+    .memory .ph {
+      width: 100%;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      border-radius: 18px 18px 0 0;
+      background: linear-gradient(135deg, #5a2a5e, #8a3a67)
+    }
+
+    .memory .body {
+      padding: 14px 16px 18px
+    }
+
+    .memory .date {
+      color: var(--gold);
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase
+    }
+
+    .memory h3 {
+      font-size: 1.15rem;
+      margin: 4px 0 6px
+    }
+
+    .memory p {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: .95rem
+    }
+
+    /* ---------- reasons ---------- */
+    .reasons {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      width: 100%;
+      max-width: 560px
+    }
+
+    .card {
+      perspective: 800px;
+      height: 150px;
+      cursor: pointer
+    }
+
+    .card-in {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform .7s;
+      transform-style: preserve-3d
+    }
+
+    .card.flip .card-in {
+      transform: rotateY(180deg)
+    }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      font-size: .92rem;
+      line-height: 1.4
+    }
+
+    .front {
+      background: linear-gradient(135deg, var(--rose), #9b3b7a);
+      font-size: 1.6rem;
+      flex-direction: column;
+      gap: 4px
+    }
+
+    .front small {
+      font-size: .75rem;
+      opacity: .8
+    }
+
+    .back {
+      background: var(--cream);
+      color: var(--ink);
+      transform: rotateY(180deg);
+      font-weight: 500
+    }
+
+    /* ---------- letter ---------- */
+    .paper {
+      width: 100%;
+      max-width: 520px;
+      background: var(--cream);
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 28px 24px 32px;
+      text-align: left;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, .45);
+      background-image: repeating-linear-gradient(transparent 0 33px, rgba(232, 88, 138, .18) 33px 34px);
+      background-position: 0 18px;
+      font-family: Caveat, cursive;
+      font-size: 1.45rem;
+      line-height: 34px;
+      min-height: 300px;
+    }
+
+    #letterText {
+      white-space: pre-wrap
+    }
+
+    #letterText::after {
+      content: "|";
+      animation: pulse 1s infinite;
+      color: var(--rose)
+    }
+
+    #letterText.done::after {
+      content: ""
+    }
+
+    .sign {
+      text-align: right;
+      margin-top: 16px;
+      font-weight: 700;
+      color: var(--rose);
+      opacity: 0;
+      transition: opacity 1s
+    }
+
+    .sign.show {
+      opacity: 1
+    }
+
+    /* ---------- final ---------- */
+    .big-heart {
+      font-size: 5rem;
+      animation: beat 1.2s infinite
+    }
+
+    @keyframes beat {
+
+      0%,
+      100% {
+        transform: scale(1)
+      }
+
+      15% {
+        transform: scale(1.18)
+      }
+
+      30% {
+        transform: scale(1)
+      }
+
+      45% {
+        transform: scale(1.12)
+      }
+    }
+
+    .float-heart {
+      position: fixed;
+      bottom: -40px;
+      z-index: 0;
+      pointer-events: none;
+      animation: floatUp linear forwards
+    }
+
+    @keyframes floatUp {
+      to {
+        transform: translateY(-115vh) rotate(25deg);
+        opacity: 0
+      }
+    }
+
+    #musicBtn {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 60;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 0;
+      background: rgba(255, 255, 255, .12);
+      color: var(--text);
+      font-size: 1.2rem;
+      cursor: pointer;
+      backdrop-filter: blur(6px)
+    }
+  </style>
+</head>
+
+<body>
+  <div id="stars"></div>
+  <canvas id="fx"></canvas>
+  <audio id="music" loop preload="auto"></audio>
+  <button id="musicBtn" class="hidden" aria-label="Musik">🎵</button>
+
+  <!-- 0. LOCK -->
+  <section class="scene" id="s-lock">
+    <div style="font-size:3rem">🔒</div>
+    <h2 class="script">Hai, <span data-f="panggilan"></span></h2>
+    <p class="sub" data-f="petunjukPassword"></p>
+    <div class="lock-box">
+      <input id="pw" autocomplete="off" placeholder="••••••••">
+      <button class="btn" id="pwBtn">Buka</button>
+    </div>
+  </section>
+
+  <!-- 1. ENVELOPE -->
+  <section class="scene" id="s-envelope">
+    <p class="sub">Ada sesuatu buat kamu…</p>
+    <div class="envelope" id="envelope">
+      <div class="env-back"></div>
+      <div class="env-letter">Untuk <span data-f="panggilan" style="margin-left:.3em"></span> 💕</div>
+      <div class="env-pocket"></div>
+      <div class="env-flap"></div>
+      <div class="env-seal">💌</div>
+    </div>
+    <p class="hint" id="envHint">ketuk amplopnya</p>
+  </section>
+
+  <!-- 2. CAKE -->
+  <section class="scene" id="s-cake">
+    <h2 class="script" id="cakeTitle">Make a wish dulu… ✨</h2>
+    <p class="sub" id="cakeHint">Tutup mata, bikin permohonan, lalu tiup lilinnya</p>
+    <div class="cake-wrap">
+      <div class="candles" id="candles"></div>
+      <div class="layer l2">
+        <div class="drip"></div>
+      </div>
+      <div class="layer l1">
+        <div class="drip"></div>
+      </div>
+      <div class="plate"></div>
+    </div>
+    <div id="cakeActions" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <button class="btn" id="micBtn">🎤 Tiup pakai mic</button>
+    </div>
+    <p class="sub" style="font-size:.85rem">atau ketuk apinya satu per satu</p>
+    <div id="cakeDone" class="hidden" style="display:flex;flex-direction:column;align-items:center;gap:18px">
+      <h1 class="script fade-in" id="hbd"></h1>
+      <button class="btn fade-in" data-next style="animation-delay:.6s">Lanjut 💗</button>
+    </div>
+  </section>
+
+  <!-- 3. COUNTER -->
+  <section class="scene" id="s-counter">
+    <p class="sub">Sejak <span id="jadianTxt"></span>, kita sudah bersama selama</p>
+    <div class="counter">
+      <div><b id="cD">0</b><small>hari</small></div>
+      <div><b id="cH">0</b><small>jam</small></div>
+      <div><b id="cM">0</b><small>menit</small></div>
+      <div><b id="cS">0</b><small>detik</small></div>
+    </div>
+    <p class="sub">…dan aku masih jatuh cinta sama kamu, tiap detiknya.</p>
+    <button class="btn" data-next>Lihat kenangan kita 📸</button>
+  </section>
+
+  <!-- 4. TIMELINE -->
+  <section class="scene scroll" id="s-timeline">
+    <h2 class="script">Cerita kita</h2>
+    <div class="timeline" id="timeline"></div>
+    <button class="btn" data-next>Lanjut 💗</button>
+  </section>
+
+  <!-- 5. REASONS -->
+  <section class="scene scroll" id="s-reasons">
+    <h2 class="script">Hal-hal yang aku suka dari kamu</h2>
+    <p class="sub">ketuk kartunya satu-satu</p>
+    <div class="reasons" id="reasons"></div>
+    <button class="btn" data-next>Ada surat buat kamu 💌</button>
+  </section>
+
+  <!-- 6. LETTER -->
+  <section class="scene scroll" id="s-letter">
+    <div class="paper" id="paper">
+      <div id="letterText"></div>
+      <div class="sign" id="sign">— <span data-f="dari"></span></div>
+    </div>
+    <p class="sub" style="font-size:.85rem" id="skipHint">ketuk kertasnya untuk menampilkan semua</p>
+    <button class="btn hidden" id="letterNext" data-next>Satu lagi… 💗</button>
+  </section>
+
+  <!-- 7. FINAL -->
+  <section class="scene" id="s-final">
+    <div class="big-heart">💖</div>
+    <h1 class="script">Aku sayang kamu, <span data-f="panggilan"></span></h1>
+    <p class="sub" data-f="penutup"></p>
+    <button class="btn ghost" onclick="location.reload()">↺ Ulangi dari awal</button>
+  </section>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const C = CONFIG;
+
+    // ---------- fill simple fields ----------
+    document.querySelectorAll("[data-f]").forEach(el => el.textContent = C[el.dataset.f] ?? "");
+
+    // ---------- stars ----------
+    for (let i = 0; i < 90; i++) {
+      const s = document.createElement("span");
+      s.style.left = Math.random() * 100 + "%";
+      s.style.top = Math.random() * 100 + "%";
+      s.style.animationDelay = Math.random() * 3 + "s";
+      if (Math.random() < .2) { s.style.width = s.style.height = "3px"; }
+      $("#stars").appendChild(s);
+    }
+
+    // ---------- scene flow ----------
+    const order = [C.password ? "lock" : null, "envelope", "cake", "counter", "timeline", "reasons", "letter", "final"].filter(Boolean);
+    let idx = -1;
+    const hooks = {};
+    function go(i) {
+      if (idx >= 0) $("#s-" + order[idx]).classList.remove("active");
+      idx = i;
+      const el = $("#s-" + order[idx]);
+      el.scrollTop = 0;
+      el.classList.add("active");
+      hooks[order[idx]]?.();
+    }
+    const next = () => go(idx + 1);
+    document.querySelectorAll("[data-next]").forEach(b => b.addEventListener("click", next));
+
+    // ---------- music ----------
+    const music = $("#music");
+    if (C.lagu) {
+      music.src = C.lagu;
+      music.addEventListener("error", () => $("#musicBtn").classList.add("hidden"));
+    }
+    function playMusic() {
+      if (!C.lagu) return;
+      music.play().then(() => $("#musicBtn").classList.remove("hidden")).catch(() => { });
+    }
+    $("#musicBtn").onclick = () => {
+      if (music.paused) { music.play(); $("#musicBtn").textContent = "🎵"; }
+      else { music.pause(); $("#musicBtn").textContent = "🔇"; }
+    };
+
+    // ---------- lock ----------
+    function tryPw() {
+      const norm = v => v.trim().toLowerCase().replace(/\s+/g, "");
+      if (norm($("#pw").value) === norm(C.password)) { playMusic(); next(); }
+      else { const b = $(".lock-box"); b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake"); }
+    }
+    $("#pwBtn").onclick = tryPw;
+    $("#pw").addEventListener("keydown", e => e.key === "Enter" && tryPw());
+
+    // ---------- envelope ----------
+    $("#envelope").addEventListener("click", function () {
+      if (this.classList.contains("open")) return;
+      this.classList.add("open");
+      $("#envHint").classList.add("hidden");
+      playMusic();
+      setTimeout(next, 2600);
+    });
+
+    // ---------- cake ----------
+    for (let i = 0; i < C.jumlahLilin; i++) {
+      const c = document.createElement("div");
+      c.className = "candle";
+      c.innerHTML = '<div class="flame"></div><div class="smoke"></div>';
+      c.addEventListener("click", () => blow(c));
+      $("#candles").appendChild(c);
+    }
+    const lit = () => [...document.querySelectorAll(".candle:not(.out)")];
+    function blow(c) {
+      if (!c || c.classList.contains("out")) return;
+      c.classList.add("out");
+      if (lit().length === 0) celebrate();
+    }
+    let celebrated = false;
+    function celebrate() {
+      if (celebrated) return;
+      celebrated = true;
+      $("#cakeTitle").classList.add("hidden");
+      $("#cakeHint").classList.add("hidden");
+      $("#cakeActions").classList.add("hidden");
+      $("#cakeActions").nextElementSibling.classList.add("hidden");
+      $("#hbd").textContent = `Selamat ulang tahun ke-${C.ultahKe}, ${C.nama}! 🎉`;
+      $("#cakeDone").classList.remove("hidden");
+      confetti(220);
+      setTimeout(() => confetti(140), 700);
+    }
+    $("#micBtn").onclick = async () => {
+      const hint = $("#cakeHint");
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const an = ctx.createAnalyser();
+        an.fftSize = 512;
+        ctx.createMediaStreamSource(stream).connect(an);
+        const data = new Uint8Array(an.fftSize);
+        let loud = 0;
+        $("#micBtn").textContent = "🌬️ Tiup sekarang!";
+        const tick = () => {
+          an.getByteTimeDomainData(data);
+          let sum = 0;
+          for (const v of data) { const x = (v - 128) / 128; sum += x * x; }
+          const rms = Math.sqrt(sum / data.length);
+          if (rms > 0.15) { if (++loud > 5) { blow(lit()[0]); loud = 0; } }
+          else loud = Math.max(0, loud - 1);
+          if (lit().length) requestAnimationFrame(tick);
+          else { stream.getTracks().forEach(t => t.stop()); ctx.close(); }
+        };
+        tick();
+      } catch (e) {
+        hint.textContent = "Mic-nya nggak bisa dipakai, ketuk apinya aja ya 🕯️";
+        $("#micBtn").classList.add("hidden");
+      }
+    };
+
+    // ---------- counter ----------
+    const jadian = new Date(C.tanggalJadian + "T00:00:00");
+    $("#jadianTxt").textContent = jadian.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+    let counterTimer;
+    hooks.counter = () => {
+      const upd = () => {
+        let s = Math.max(0, Math.floor((Date.now() - jadian) / 1000));
+        $("#cD").textContent = Math.floor(s / 86400).toLocaleString("id-ID");
+        $("#cH").textContent = Math.floor(s % 86400 / 3600);
+        $("#cM").textContent = Math.floor(s % 3600 / 60);
+        $("#cS").textContent = s % 60;
+      };
+      upd();
+      clearInterval(counterTimer);
+      counterTimer = setInterval(upd, 1000);
+    };
+
+    // ---------- timeline ----------
+    C.kenangan.forEach(k => {
+      const m = document.createElement("article");
+      m.className = "memory";
+      const ph = '<div class="ph">📸</div>';
+      m.innerHTML = (k.foto ? `<img class="photo" loading="lazy" alt="">` : ph) +
+        `<div class="body"><div class="date"></div><h3></h3><p></p></div>`;
+      if (k.foto) {
+        const img = m.querySelector("img");
+        img.src = k.foto;
+        img.onerror = () => img.outerHTML = ph;
+      }
+      if (k.tanggal) m.querySelector(".date").textContent = k.tanggal; else m.querySelector(".date").remove();
+      m.querySelector("h3").textContent = k.judul;
+      m.querySelector("p").textContent = k.cerita;
+      $("#timeline").appendChild(m);
+    });
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("show"); io.unobserve(e.target); }
+    }), { root: $("#s-timeline"), threshold: .15 });
+    document.querySelectorAll(".memory").forEach(m => io.observe(m));
+
+    // ---------- reasons ----------
+    C.alasan.forEach((a, i) => {
+      const c = document.createElement("div");
+      c.className = "card";
+      c.innerHTML = `<div class="card-in"><div class="face front">💗<small>#${i + 1}</small></div><div class="face back"></div></div>`;
+      c.querySelector(".back").textContent = a;
+      c.onclick = () => {
+        if (!c.classList.contains("flip")) {
+          c.classList.add("flip");
+          const r = c.getBoundingClientRect();
+          confetti(18, r.left + r.width / 2, r.top + r.height / 2);
+        }
+      };
+      $("#reasons").appendChild(c);
+    });
+
+    // ---------- letter ----------
+    let typing, typed = false;
+    function finishLetter() {
+      clearInterval(typing);
+      $("#letterText").textContent = C.surat;
+      $("#letterText").classList.add("done");
+      $("#sign").classList.add("show");
+      $("#skipHint").classList.add("hidden");
+      $("#letterNext").classList.remove("hidden");
+      typed = true;
+    }
+    hooks.letter = () => {
+      if (typed) return;
+      let i = 0;
+      const el = $("#letterText"), sc = $("#s-letter");
+      typing = setInterval(() => {
+        el.textContent = C.surat.slice(0, ++i);
+        if (sc.scrollHeight > sc.clientHeight) sc.scrollTop = sc.scrollHeight;
+        if (i >= C.surat.length) finishLetter();
+      }, 38);
+    };
+    $("#paper").addEventListener("click", () => !typed && finishLetter());
+
+    // ---------- final ----------
+    hooks.final = () => {
+      confetti(260);
+      const hearts = ["💗", "💖", "💕", "💞", "🌸", "✨"];
+      setInterval(() => {
+        const h = document.createElement("span");
+        h.className = "float-heart";
+        h.textContent = hearts[Math.random() * hearts.length | 0];
+        h.style.left = Math.random() * 100 + "vw";
+        h.style.fontSize = 14 + Math.random() * 22 + "px";
+        h.style.animationDuration = 6 + Math.random() * 6 + "s";
+        h.addEventListener("animationend", () => h.remove());
+        document.body.appendChild(h);
+      }, 350);
+    };
+
+    // ---------- confetti ----------
+    const cv = $("#fx"), cx = cv.getContext("2d");
+    const colors = ["#ff9cbc", "#ffd98e", "#e8588a", "#ffffff", "#c9a0ff", "#8fe3cf"];
+    let parts = [], running = false;
+    function resize() {
+      const d = devicePixelRatio || 1;
+      cv.width = innerWidth * d; cv.height = innerHeight * d;
+      cx.setTransform(d, 0, 0, d, 0, 0);
+    }
+    addEventListener("resize", resize); resize();
+    function confetti(n, x = innerWidth / 2, y = innerHeight * .45) {
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, sp = 4 + Math.random() * (n > 50 ? 12 : 6);
+        parts.push({
+          x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 5,
+          s: 5 + Math.random() * 6, c: colors[Math.random() * colors.length | 0],
+          r: Math.random() * 6.28, vr: (Math.random() - .5) * .3, heart: Math.random() < .25, life: 0,
+        });
+      }
+      if (!running) { running = true; requestAnimationFrame(loop); }
+    }
+    function loop() {
+      cx.clearRect(0, 0, innerWidth, innerHeight);
+      parts = parts.filter(p => p.y < innerHeight + 30 && p.life < 360);
+      for (const p of parts) {
+        p.life++; p.vx *= .985; p.vy = p.vy * .985 + .22; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+        cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c;
+        if (p.heart) { cx.font = `${p.s * 2.4}px sans-serif`; cx.fillText("♥", -p.s, p.s); }
+        else cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
+        cx.restore();
+      }
+      if (parts.length) requestAnimationFrame(loop);
+      else { running = false; cx.clearRect(0, 0, innerWidth, innerHeight); }
+    }
+
+    go(0);
+  </script>
+</body>
+
+</html>

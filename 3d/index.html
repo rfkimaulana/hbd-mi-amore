@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Untuk Kamu 💌</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <script>
+    /* =====================================================================
+       ✏️  ISI DATA DI SINI — sama seperti versi biasa (../index.html)
+       Path foto & lagu relatif ke folder utama, jadi tidak perlu diubah.
+       ===================================================================== */
+    const CONFIG = {
+      nama: "Sierra Antonio",           // nama dia
+      panggilan: "mi amore",            // panggilan sayang
+      dari: "Geo",                      // namamu / panggilanmu dari dia
+      ultahKe: 23,                      // ulang tahun ke-berapa
+      jumlahLilin: 5,                   // jumlah lilin di kue
+      tanggalJadian: "2026-08-17",      // format YYYY-MM-DD
+
+      // Password pembuka (opsional). Kosongkan "" kalau tidak mau pakai password.
+      password: "kadalhitam16",
+      petunjukPassword: "nama kuda + warna fav geo + ulang tahun geo (huruf kecil semua)",
+
+      // Lagu (opsional): taruh file mp3 di folder yang sama, misal "lagu.mp3". Kosongkan "" kalau tidak ada.
+      lagu: "lagu.mp3",
+
+      // Timeline kenangan — foto taruh di folder "foto/". Kosongkan foto: "" kalau tidak ada.
+      kenangan: [
+        { judul: "Berdua di Tepi Laut", cerita: "Malam berbadai, satu kuda, dua penunggang. Ombak boleh ribut, yang penting kamu pegangan di belakang aku.", foto: "foto/pantai.jpg" },
+        { judul: "Dermaga Blackwater", cerita: "Duduk di ujung dermaga, lampu kota di belakang, kepala kamu nyender di bahu aku. Nggak perlu banyak omong.", foto: "foto/dermaga.jpg" },
+        { judul: "Di Atas Salju", cerita: "Naik sampai puncak gunung bersalju cuma buat lihat bintang bareng kamu. Dingin, tapi worth it.", foto: "foto/gunung.jpg" },
+        { judul: "Sepasang Outlaw", cerita: "Jalan berdua di Blackwater, kompak kayak partner in crime. Siapa pun yang lewat tahu kita satu geng.", foto: "foto/blackwater.jpg" },
+        { judul: "Senja Paling Indah", cerita: "Gandengan tangan lihat matahari tenggelam di danau. Kalau bisa, aku mau berhenti di momen ini selamanya.", foto: "foto/sunset.jpg" },
+        { judul: "Jalan-jalan ke Kota", cerita: "Topi koboi, jaket kulit, senyum tipis kamu. Cowboy di sebelah kamu ini beruntung banget.", foto: "foto/kota.jpg" },
+        { judul: "Malam di Saloon", cerita: "Duduk berdua di saloon, dunia ramai di sekitar, tapi mata aku cuma ke kamu.", foto: "foto/saloon.jpg" },
+      ],
+
+      // Hal-hal yang kamu suka dari dia (bisa berapa saja)
+      alasan: [
+        "Tatapan kamu yang bikin cowboy ini luluh",
+        "Kamu selalu ikut kemana pun aku pergi, dari pantai sampai gunung salju",
+        "Gaya koboi kamu yang paling cantik se-Blackwater",
+        "Kamu tempat aku pulang setelah hari yang panjang",
+        "Senyum kamu pas kita lihat senja bareng",
+        "Karena kamu, mi amore. Udah, itu aja cukup.",
+      ],
+
+      // Surat utama — tulis bebas, enter = baris baru
+      surat: `Selamat ulang tahun yang ke-23, mi amore.
+
+Di dunia yang keras, penuh debu, peluru, dan orang-orang yang nggak bisa dipercaya, kamu jadi hal paling tenang yang pernah aku punya. Dari malam berbadai di pantai, duduk berdua di dermaga Blackwater, sampai lihat bintang di puncak gunung salju, semuanya jadi berarti karena ada kamu di sebelah aku.
+
+Makasih udah mau jalan bareng aku, ikut ke mana pun kuda ini bawa kita. Semoga tahun ini semua yang kamu harapkan tercapai, dan jalan kamu selalu dimudahkan.
+
+Terima kasih udah jadi kamu, Sierra.`,
+
+      penutup: "Selama matahari masih tenggelam di ujung danau, aku bakal tetap di sebelah kamu. Te amo, mi amore.",
+    };
+    const BASE = "../";
+    /* ===================================================================== */
+
+    // Kalau 3D gagal dimuat (browser lama / tanpa WebGL), tawarkan versi biasa.
+    setTimeout(() => { if (!window.__ok) document.getElementById("fallback").hidden = false; }, 12000);
+  </script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #12081a;
+      --pink: #ff9cbc;
+      --rose: #e8588a;
+      --gold: #ffd98e;
+      --cream: #fff7ee;
+      --ink: #43293a;
+      --text: #fdebf3;
+      --muted: #d9b8ca;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Quicksand, system-ui, sans-serif;
+    }
+
+    #gl {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 0;
+      touch-action: none;
+    }
+
+    body.grab #gl {
+      cursor: grab
+    }
+
+    /* ---------- scenes (HTML di atas kanvas 3D) ---------- */
+    .scene {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      padding: max(28px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+      text-align: center;
+      overflow-y: auto;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(14px);
+      transition: opacity .8s, visibility .8s, transform .8s;
+    }
+
+    .scene.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: none;
+    }
+
+    .scene>:first-child {
+      margin-top: auto
+    }
+
+    .scene>:last-child {
+      margin-bottom: auto
+    }
+
+    /* split: teks di atas & bawah, objek 3D di tengah */
+    .scene.split {
+      justify-content: space-between;
+      overflow: hidden
+    }
+
+    .scene.split>* {
+      margin: 0 !important
+    }
+
+    .top,
+    .bottom {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%
+    }
+
+    /* pass: sentuhan tembus ke kanvas 3D, kecuali elemen .ui */
+    .scene.pass.active {
+      pointer-events: none
+    }
+
+    .scene.pass.active .ui {
+      pointer-events: auto
+    }
+
+    .script {
+      font-family: "Dancing Script", cursive;
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--pink);
+      text-shadow: 0 0 24px rgba(255, 110, 165, .5), 0 2px 10px rgba(0, 0, 0, .5);
+    }
+
+    h1.script {
+      font-size: clamp(2rem, 8vw, 3.4rem)
+    }
+
+    h2.script {
+      font-size: clamp(1.9rem, 7vw, 2.8rem)
+    }
+
+    .sub {
+      color: var(--muted);
+      max-width: 440px;
+      line-height: 1.6;
+      text-shadow: 0 1px 8px rgba(0, 0, 0, .6);
+    }
+
+    .small {
+      font-size: .85rem
+    }
+
+    .hint {
+      color: var(--gold);
+      font-size: .95rem;
+      animation: pulse 2s infinite;
+      text-shadow: 0 1px 8px rgba(0, 0, 0, .6);
+    }
+
+    @keyframes pulse {
+      50% {
+        opacity: .45
+      }
+    }
+
+    .btn {
+      font: 700 1rem Quicksand, sans-serif;
+      color: #2a1020;
+      background: linear-gradient(135deg, var(--pink), var(--gold));
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 30px;
+      cursor: pointer;
+      box-shadow: 0 8px 28px rgba(232, 88, 138, .45);
+      transition: transform .2s;
+    }
+
+    .btn:active {
+      transform: scale(.95)
+    }
+
+    .btn.ghost {
+      background: rgba(18, 8, 26, .4);
+      color: var(--pink);
+      border: 1.5px solid var(--pink);
+      box-shadow: none
+    }
+
+    .hidden {
+      display: none !important
+    }
+
+    .glass {
+      background: rgba(28, 10, 38, .55);
+      border: 1px solid rgba(255, 156, 188, .28);
+      border-radius: 18px;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+
+    .fade-in {
+      animation: fadeUp .9s both
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px)
+      }
+    }
+
+    /* ---------- lock ---------- */
+    .lock-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      max-width: 320px
+    }
+
+    .lock-box input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(255, 156, 188, .45);
+      background: rgba(28, 10, 38, .6);
+      color: var(--text);
+      font: 500 1.1rem Quicksand, sans-serif;
+      text-align: center;
+      letter-spacing: .15em;
+      outline: none;
+    }
+
+    .lock-box input:focus {
+      border-color: var(--pink)
+    }
+
+    .shake {
+      animation: shake .4s
+    }
+
+    @keyframes shake {
+
+      25%,
+      75% {
+        transform: translateX(-8px)
+      }
+
+      50% {
+        transform: translateX(8px)
+      }
+    }
+
+    /* ---------- counter ---------- */
+    .panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      width: 100%;
+      max-width: 480px;
+      padding: 24px 14px;
+      background: rgba(28, 10, 38, .78);
+    }
+
+    .counter {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 440px
+    }
+
+    .counter div {
+      padding: 14px 4px
+    }
+
+    .counter b {
+      display: block;
+      font-size: clamp(1.4rem, 6vw, 2rem);
+      color: var(--gold);
+      text-shadow: 0 0 16px rgba(255, 217, 142, .45)
+    }
+
+    .counter small {
+      color: var(--muted);
+      font-size: .8rem
+    }
+
+    /* ---------- timeline / carousel ---------- */
+    .caption {
+      width: 100%;
+      max-width: 420px;
+      padding: 14px 18px;
+      transition: opacity .35s, transform .35s;
+    }
+
+    .caption.swap {
+      opacity: 0;
+      transform: translateY(8px)
+    }
+
+    .caption h3 {
+      font-family: "Dancing Script", cursive;
+      color: var(--pink);
+      font-size: 1.6rem;
+      line-height: 1.2
+    }
+
+    .caption p {
+      font-size: .95rem;
+      line-height: 1.5;
+      margin-top: 4px
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 14px
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      color: var(--pink);
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px
+    }
+
+    .dots span {
+      width: 7px;
+      height: 7px;
+      border-radius: 99px;
+      background: rgba(255, 156, 188, .35);
+      transition: width .3s, background .3s
+    }
+
+    .dots span.on {
+      width: 20px;
+      background: var(--pink)
+    }
+
+    /* ---------- reasons ---------- */
+    .reasons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 520px
+    }
+
+    .card {
+      perspective: 800px;
+      height: 150px;
+      cursor: pointer
+    }
+
+    .card-in {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform .8s cubic-bezier(.2, .8, .2, 1);
+      transform-style: preserve-3d
+    }
+
+    .card.flip .card-in {
+      transform: rotateY(180deg)
+    }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+
+    .front {
+      background: linear-gradient(145deg, rgba(255, 120, 170, .38), rgba(110, 40, 140, .5));
+      border: 1px solid rgba(255, 156, 188, .45);
+      font-size: 2.2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    }
+
+    .front small {
+      font-size: .8rem;
+      color: var(--muted);
+      margin-top: 6px
+    }
+
+    .back {
+      transform: rotateY(180deg);
+      background: linear-gradient(145deg, #fff7ee, #ffe0ea);
+      color: var(--ink);
+      font-family: Caveat, cursive;
+      font-size: 1.3rem;
+      font-weight: 700;
+      line-height: 1.2;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    }
+
+    /* ---------- letter ---------- */
+    .paper {
+      width: 100%;
+      max-width: 520px;
+      padding: 28px 24px;
+      border-radius: 14px;
+      background: linear-gradient(#fff9f2, #ffeef3);
+      color: var(--ink);
+      font-family: Caveat, cursive;
+      font-size: 1.45rem;
+      line-height: 1.45;
+      text-align: left;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .55);
+      cursor: pointer;
+    }
+
+    #letterText {
+      white-space: pre-wrap
+    }
+
+    .sign {
+      text-align: right;
+      margin-top: 16px;
+      font-weight: 700;
+      color: var(--rose);
+      opacity: 0;
+      transition: opacity 1s
+    }
+
+    .sign.show {
+      opacity: 1
+    }
+
+    /* ---------- misc ---------- */
+    #musicBtn {
+      position: fixed;
+      top: max(14px, env(safe-area-inset-top));
+      right: 14px;
+      z-index: 5;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    #loading {
+      position: fixed;
+      inset: 0;
+      z-index: 6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      color: var(--pink);
+      font-family: "Dancing Script", cursive;
+      font-size: 1.8rem;
+      transition: opacity 1s, visibility 1s;
+    }
+
+    #loading.gone {
+      opacity: 0;
+      visibility: hidden
+    }
+
+    #fallback {
+      position: fixed;
+      inset: 0;
+      z-index: 7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 24px;
+      text-align: center;
+      background: var(--bg);
+    }
+
+    #fallback[hidden] {
+      display: none
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="gl"></canvas>
+  <div id="loading">memuat… 💗</div>
+  <div id="fallback" hidden>
+    <p class="sub">Versi 3D belum bisa dibuka di perangkat ini.</p>
+    <a class="btn" href="../">Buka versi biasa 💌</a>
+  </div>
+  <audio id="music" loop preload="auto"></audio>
+  <button id="musicBtn" class="glass hidden" aria-label="Musik">🎵</button>
+
+  <!-- 0. LOCK -->
+  <section class="scene split" id="s-lock">
+    <div class="top">
+      <h2 class="script">Hai, <span data-f="panggilan"></span></h2>
+    </div>
+    <div class="bottom">
+      <p class="sub" data-f="petunjukPassword"></p>
+      <div class="lock-box">
+        <input id="pw" autocomplete="off" placeholder="••••••••">
+        <button class="btn" id="pwBtn">Buka</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1. GIFT -->
+  <section class="scene split pass" id="s-envelope">
+    <div class="top">
+      <p class="sub">Ada sesuatu buat kamu…</p>
+    </div>
+    <div class="bottom">
+      <p class="hint" id="envHint">ketuk kadonya 🎁</p>
+    </div>
+  </section>
+
+  <!-- 2. CAKE -->
+  <section class="scene split pass" id="s-cake">
+    <div class="top">
+      <h2 class="script" id="cakeTitle">Make a wish dulu… ✨</h2>
+      <p class="sub" id="cakeHint">Tutup mata, bikin permohonan, lalu tiup lilinnya</p>
+      <h1 class="script fade-in hidden" id="hbd"></h1>
+    </div>
+    <div class="bottom">
+      <div id="cakeActions" class="bottom">
+        <button class="btn ui" id="micBtn">🎤 Tiup pakai mic</button>
+        <p class="sub small">atau ketuk apinya satu per satu · geser untuk memutar kue</p>
+      </div>
+      <button class="btn ui fade-in hidden" id="cakeNext" data-next>Lanjut 💗</button>
+    </div>
+  </section>
+
+  <!-- 3. COUNTER -->
+  <section class="scene" id="s-counter">
+    <div class="panel glass">
+      <p class="sub">Sejak <span id="jadianTxt"></span>, kita sudah bersama selama</p>
+      <div class="counter">
+        <div class="glass"><b id="cD">0</b><small>hari</small></div>
+        <div class="glass"><b id="cH">0</b><small>jam</small></div>
+        <div class="glass"><b id="cM">0</b><small>menit</small></div>
+        <div class="glass"><b id="cS">0</b><small>detik</small></div>
+      </div>
+      <p class="sub">…dan aku masih jatuh cinta sama kamu, tiap detiknya.</p>
+      <button class="btn" data-next>Lihat kenangan kita 📸</button>
+    </div>
+  </section>
+
+  <!-- 4. TIMELINE (carousel 3D) -->
+  <section class="scene split pass" id="s-timeline">
+    <div class="top">
+      <h2 class="script">Cerita kita</h2>
+      <p class="hint small">geser atau ketuk fotonya</p>
+    </div>
+    <div class="bottom ui">
+      <div class="caption glass" id="caption">
+        <h3 id="capT"></h3>
+        <p id="capP"></p>
+      </div>
+      <div class="nav">
+        <button class="icon glass" id="prevB" aria-label="Sebelumnya">‹</button>
+        <div class="dots" id="dots"></div>
+        <button class="icon glass" id="nextB" aria-label="Berikutnya">›</button>
+      </div>
+      <button class="btn" data-next>Lanjut 💗</button>
+    </div>
+  </section>
+
+  <!-- 5. REASONS -->
+  <section class="scene" id="s-reasons">
+    <h2 class="script">Hal-hal yang aku suka dari kamu</h2>
+    <p class="sub">ketuk kartunya satu-satu</p>
+    <div class="reasons" id="reasons"></div>
+    <button class="btn" data-next>Ada surat buat kamu 💌</button>
+  </section>
+
+  <!-- 6. LETTER -->
+  <section class="scene" id="s-letter">
+    <div class="paper" id="paper">
+      <div id="letterText"></div>
+      <div class="sign" id="sign">— <span data-f="dari"></span></div>
+    </div>
+    <p class="sub small" id="skipHint">ketuk kertasnya untuk menampilkan semua</p>
+    <button class="btn hidden" id="letterNext" data-next>Satu lagi… 💗</button>
+  </section>
+
+  <!-- 7. FINAL -->
+  <section class="scene split" id="s-final">
+    <div class="top">
+      <h1 class="script">Aku sayang kamu, <span data-f="panggilan"></span></h1>
+    </div>
+    <div class="bottom">
+      <p class="sub" data-f="penutup"></p>
+      <button class="btn ghost" onclick="location.reload()">↺ Ulangi dari awal</button>
+    </div>
+  </section>
+
+  <script type="module">
+    import * as THREE from "three";
+    import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+    import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+    import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+    import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+
+    const $ = s => document.querySelector(s);
+    const C = CONFIG;
+    const V3 = THREE.Vector3;
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const wrapA = a => Math.atan2(Math.sin(a), Math.cos(a));
+    const ease = e => e < .5 ? 4 * e * e * e : 1 - Math.pow(-2 * e + 2, 3) / 2;
+
+    document.querySelectorAll("[data-f]").forEach(el => el.textContent = C[el.dataset.f] ?? "");
+
+    // =====================================================================
+    // RENDERER
+    // =====================================================================
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas: $("#gl"), antialias: true, powerPreference: "high-performance" });
+    } catch (e) {
+      $("#fallback").hidden = false;
+      throw e;
+    }
+    window.__ok = true;
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
+    renderer.toneMapping = THREE.NeutralToneMapping;
+
+    const scene = new THREE.Scene();
+    const BG = new THREE.Color(0x12081a);
+    scene.background = BG;
+    scene.fog = new THREE.FogExp2(BG, 0.034);
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 500);
+
+    scene.add(new THREE.HemisphereLight(0xffd6e7, 0x2a1036, 1.2));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
+    scene.add(keyLight, keyLight.target);
+
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.9, 0.55, 1.0);
+    composer.addPass(bloom);
+    composer.addPass(new OutputPass());
+
+    // ---------- tekstur kanvas ----------
+    function radialTex(stops) {
+      const c = document.createElement("canvas");
+      c.width = c.height = 128;
+      const g = c.getContext("2d"), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+      stops.forEach(([o, col]) => gr.addColorStop(o, col));
+      g.fillStyle = gr;
+      g.fillRect(0, 0, 128, 128);
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    }
+    const dotTex = radialTex([[0, "rgba(255,255,255,1)"], [.25, "rgba(255,255,255,.8)"], [1, "rgba(255,255,255,0)"]]);
+    const glowTex = radialTex([[0, "rgba(255,255,255,.9)"], [.3, "rgba(255,255,255,.35)"], [1, "rgba(255,255,255,0)"]]);
+
+    // ---------- geometri hati ----------
+    function heartShape() {
+      const s = new THREE.Shape();
+      for (let i = 0; i <= 90; i++) {
+        const t = i / 90 * Math.PI * 2;
+        const x = 16 * Math.sin(t) ** 3;
+        const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+        i ? s.lineTo(x / 16, y / 16) : s.moveTo(x / 16, y / 16);
+      }
+      return s;
+    }
+    const heartGeo = new THREE.ExtrudeGeometry(heartShape(), { depth: .35, bevelEnabled: true, bevelThickness: .18, bevelSize: .14, bevelSegments: 5, curveSegments: 10 });
+    heartGeo.center();
+    const heartGeoLow = new THREE.ExtrudeGeometry(heartShape(), { depth: .3, bevelEnabled: true, bevelThickness: .1, bevelSize: .08, bevelSegments: 2 });
+    heartGeoLow.center();
+    const heartMat = () => new THREE.MeshPhysicalMaterial({
+      color: 0xff4f86, emissive: 0xff2d6f, emissiveIntensity: .55, roughness: .25, metalness: .1, clearcoat: 1, clearcoatRoughness: .2,
+    });
+    const glowSprite = (color, size) => {
+      const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+      s.scale.setScalar(size);
+      return s;
+    };
+
+    // =====================================================================
+    // STASIUN (tiap scene punya tempat sendiri di dunia 3D)
+    // =====================================================================
+    const ALL = ["lock", "envelope", "cake", "counter", "timeline", "reasons", "letter", "final"];
+    const ORDER = ALL.filter(k => k !== "lock" || C.password);
+    const GAP = 45;
+    const ST = {};
+    ALL.forEach((k, i) => ST[k] = { pos: new V3(Math.sin(i * 1.3) * 6, Math.cos(i * .9) * 2, -i * GAP) });
+    // w/h = ukuran area yang harus muat di layar, depth = jarak muka objek dari pusat,
+    // up = tinggi kamera, frac = geser objek ke atas (memberi ruang teks di bawah)
+    Object.assign(ST.lock, { w: 4.6, h: 4.8, depth: 0, up: .3, look: 0, frac: .06 });
+    Object.assign(ST.envelope, { w: 4.4, h: 4.8, depth: 1.2, up: 1.8, look: .4, frac: .02 });
+    Object.assign(ST.cake, { w: 5.6, h: 5.8, depth: 2.4, up: 2.6, look: .7, frac: .02 });
+    Object.assign(ST.counter, { w: 8, h: 8, depth: 0, up: 0, look: 0, frac: 0 });
+    Object.assign(ST.timeline, { w: 4.8, h: 8, depth: 3.4, up: .5, look: 0, frac: .1 });
+    Object.assign(ST.reasons, { w: 9, h: 9, depth: 0, up: 0, look: 0, frac: 0 });
+    Object.assign(ST.letter, { w: 9, h: 9, depth: 0, up: 0, look: 0, frac: 0 });
+    Object.assign(ST.final, { w: 4.8, h: 5.2, depth: 0, up: .2, look: 0, frac: .04 });
+
+    function pathAt(z) {
+      const f = THREE.MathUtils.clamp(-z / GAP, 0, ALL.length - 1), i = Math.floor(f), j = Math.min(i + 1, ALL.length - 1);
+      return new V3().lerpVectors(ST[ALL[i]].pos, ST[ALL[j]].pos, f - i);
+    }
+
+    function stationView(k) {
+      const s = ST[k], v = THREE.MathUtils.degToRad(camera.fov);
+      const hf = 2 * Math.atan(Math.tan(v / 2) * camera.aspect);
+      const dist = Math.max(s.h / 2 / Math.tan(v / 2), s.w / 2 / Math.tan(hf / 2)) + s.depth;
+      const shift = s.frac * 2 * dist * Math.tan(v / 2);
+      const look = s.pos.clone().add(new V3(0, s.look - shift, 0));
+      const pos = s.pos.clone().add(new V3(0, s.up - shift, dist));
+      return { pos, look };
+    }
+
+    // =====================================================================
+    // LATAR: bintang, hati melayang
+    // =====================================================================
+    {
+      const N = 3200, pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+      const pal = [new THREE.Color(0xffffff), new THREE.Color(0xff9cbc), new THREE.Color(0xffd98e), new THREE.Color(0xc9a0ff)];
+      for (let i = 0; i < N; i++) {
+        pos.set([rand(-70, 70), rand(-45, 45), rand(40, -ALL.length * GAP - 60)], i * 3);
+        const c = pal[Math.random() * pal.length | 0].clone().multiplyScalar(Math.random() < .12 ? 2.4 : rand(.6, 1.1));
+        col.set([c.r, c.g, c.b], i * 3);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      g.setAttribute("color", new THREE.BufferAttribute(col, 3));
+      scene.add(new THREE.Points(g, new THREE.PointsMaterial({
+        size: .32, map: dotTex, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      })));
+    }
+
+    const FLOAT_N = 150;
+    const floaters = new THREE.InstancedMesh(heartGeoLow,
+      new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xff2d6f, emissiveIntensity: .25, roughness: .35, metalness: .2 }), FLOAT_N);
+    const floatData = [];
+    {
+      const pal = [0xff7aa2, 0xe8588a, 0xffd98e, 0xc9a0ff, 0xff9cbc].map(c => new THREE.Color(c));
+      for (let i = 0; i < FLOAT_N; i++) {
+        const z = rand(30, -ALL.length * GAP - 20), c = pathAt(z), a = rand(0, Math.PI * 2), r = rand(5.5, 16);
+        floatData.push({
+          p: new V3(c.x + Math.cos(a) * r, c.y + Math.sin(a) * r * .7, z),
+          s: rand(.18, .5), ph: rand(0, 6.28), sp: rand(.3, .9), ax: new V3(rand(-1, 1), rand(-1, 1), rand(-1, 1)).normalize(),
+        });
+        floaters.setColorAt(i, pal[i % pal.length]);
+      }
+    }
+    scene.add(floaters);
+    const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new V3(), _p = new V3();
+    function updateFloaters(t) {
+      floatData.forEach((d, i) => {
+        _p.copy(d.p).setY(d.p.y + Math.sin(t * d.sp + d.ph) * .5);
+        _q.setFromAxisAngle(d.ax, t * d.sp + d.ph);
+        _m.compose(_p, _q, _s.setScalar(d.s));
+        floaters.setMatrixAt(i, _m);
+      });
+      floaters.instanceMatrix.needsUpdate = true;
+    }
+
+    // ---------- percikan naik (dipakai di beberapa stasiun) ----------
+    const sparkles = [];
+    function addSparkles(center, n, radius, height, color) {
+      const pos = new Float32Array(n * 3), sp = [];
+      for (let i = 0; i < n; i++) {
+        const a = rand(0, 6.28), r = Math.sqrt(Math.random()) * radius;
+        pos.set([Math.cos(a) * r, rand(-height / 2, height / 2), Math.sin(a) * r], i * 3);
+        sp.push(rand(.3, 1));
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      const pts = new THREE.Points(g, new THREE.PointsMaterial({
+        size: .16, map: dotTex, color: new THREE.Color(color).multiplyScalar(2), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      }));
+      pts.position.copy(center);
+      scene.add(pts);
+      sparkles.push({ pts, sp, height });
+    }
+    function updateSparkles(dt) {
+      for (const { pts, sp, height } of sparkles) {
+        const a = pts.geometry.attributes.position;
+        for (let i = 0; i < sp.length; i++) {
+          let y = a.getY(i) + sp[i] * dt;
+          if (y > height / 2) y = -height / 2;
+          a.setY(i, y);
+        }
+        a.needsUpdate = true;
+      }
+    }
+
+    // ---------- konfeti 3D ----------
+    const CONF_N = 700;
+    const confetti = new THREE.InstancedMesh(new THREE.PlaneGeometry(.14, .08),
+      new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, toneMapped: false }), CONF_N);
+    confetti.frustumCulled = false;
+    const confData = [];
+    {
+      const pal = [0xff9cbc, 0xffd98e, 0xe8588a, 0xffffff, 0xc9a0ff, 0x8fe3cf].map(c => new THREE.Color(c).multiplyScalar(1.25));
+      for (let i = 0; i < CONF_N; i++) {
+        confetti.setColorAt(i, pal[i % pal.length]);
+        confData.push({ life: 0, p: new V3(), v: new V3(), r: new THREE.Euler(), vr: new V3() });
+        confetti.setMatrixAt(i, _m.makeScale(0, 0, 0));
+      }
+    }
+    scene.add(confetti);
+    let confPtr = 0;
+    function burst(center, n, power = 7) {
+      for (let k = 0; k < n; k++) {
+        const d = confData[confPtr = (confPtr + 1) % CONF_N];
+        d.life = rand(2.5, 4);
+        d.p.copy(center);
+        d.v.set(rand(-1, 1), rand(-.2, 1), rand(-1, 1)).normalize().multiplyScalar(power * rand(.35, 1)).add(new V3(0, power * .35, 0));
+        d.r.set(rand(0, 6), rand(0, 6), rand(0, 6));
+        d.vr.set(rand(-8, 8), rand(-8, 8), rand(-8, 8));
+      }
+    }
+    function updateConfetti(dt) {
+      confData.forEach((d, i) => {
+        if (d.life <= 0) return;
+        d.life -= dt;
+        d.v.y -= 5 * dt;
+        d.v.multiplyScalar(1 - 1.4 * dt);
+        d.p.addScaledVector(d.v, dt);
+        d.r.x += d.vr.x * dt; d.r.y += d.vr.y * dt; d.r.z += d.vr.z * dt;
+        _m.compose(d.p, _q.setFromEuler(d.r), _s.setScalar(d.life > 0 ? Math.min(1, d.life) : 0));
+        confetti.setMatrixAt(i, _m);
+      });
+      confetti.instanceMatrix.needsUpdate = true;
+    }
+
+    // ---------- tween sederhana ----------
+    const tweens = [];
+    const tween = (d, fn, done, delay = 0) => tweens.push({ t: -delay, d, fn, done });
+    function updateTweens(dt) {
+      for (let i = tweens.length - 1; i >= 0; i--) {
+        const tw = tweens[i];
+        tw.t += dt;
+        if (tw.t < 0) continue;
+        const e = Math.min(1, tw.t / tw.d);
+        tw.fn(e);
+        if (e >= 1) { tweens.splice(i, 1); tw.done?.(); }
+      }
+    }
+
+    // =====================================================================
+    // 0. LOCK — hati berdetak
+    // =====================================================================
+    const lockHeart = new THREE.Mesh(heartGeo, heartMat());
+    lockHeart.scale.setScalar(1.1);
+    lockHeart.position.copy(ST.lock.pos);
+    const lockGlow = glowSprite(new THREE.Color(0xff5c8a).multiplyScalar(.9), 7);
+    lockGlow.position.copy(ST.lock.pos).z -= 1;
+    scene.add(lockHeart, lockGlow);
+
+    // =====================================================================
+    // 1. KADO
+    // =====================================================================
+    const gift = new THREE.Group();
+    gift.position.copy(ST.envelope.pos);
+    const giftMat = new THREE.MeshStandardMaterial({ color: 0xe8588a, roughness: .45, metalness: .1 });
+    const ribMat = new THREE.MeshStandardMaterial({ color: 0xffd98e, roughness: .25, metalness: .7, emissive: 0x664000, emissiveIntensity: .4 });
+    const box = new THREE.Mesh(new THREE.BoxGeometry(2, 1.8, 2), giftMat);
+    gift.add(box,
+      new THREE.Mesh(new THREE.BoxGeometry(.34, 1.82, 2.02), ribMat),
+      new THREE.Mesh(new THREE.BoxGeometry(2.02, 1.82, .34), ribMat));
+    const lid = new THREE.Group();
+    const lidMat = new THREE.MeshStandardMaterial({ color: 0xf26b9a, roughness: .45, metalness: .1, transparent: true });
+    const lidRibMat = ribMat.clone();
+    lidRibMat.transparent = true;
+    lid.add(new THREE.Mesh(new THREE.BoxGeometry(2.2, .45, 2.2), lidMat),
+      new THREE.Mesh(new THREE.BoxGeometry(.36, .47, 2.22), lidRibMat),
+      new THREE.Mesh(new THREE.BoxGeometry(2.22, .47, .36), lidRibMat));
+    for (const s of [-1, 1]) {
+      const loop = new THREE.Mesh(new THREE.TorusGeometry(.34, .1, 12, 32), lidRibMat);
+      loop.position.set(s * .32, .42, 0);
+      loop.rotation.set(0, 0, s * .6);
+      loop.scale.set(1, .75, 1);
+      lid.add(loop);
+    }
+    lid.position.y = 1.12;
+    gift.add(lid);
+    const giftHeart = new THREE.Mesh(heartGeo, heartMat());
+    giftHeart.scale.setScalar(0.001);
+    const giftGlow = glowSprite(new THREE.Color(0xffc38e).multiplyScalar(1.4), 0.001);
+    giftGlow.position.y = 1;
+    gift.add(giftHeart, giftGlow);
+    scene.add(gift);
+    let giftOpen = false;
+
+    function openGift() {
+      if (giftOpen) return;
+      giftOpen = true;
+      enableGyro();
+      playMusic();
+      $("#envHint").classList.add("hidden");
+      const lx = lid.position.clone();
+      tween(1.3, e => {
+        const k = ease(e);
+        lid.position.set(lx.x + k * 1.6, lx.y + k * 3.2, lx.z - k * 1.2);
+        lid.rotation.set(-k * 1.1, 0, -k * .7);
+        lidMat.opacity = lidRibMat.opacity = 1 - Math.max(0, (e - .5) * 2);
+      });
+      tween(1.2, e => giftGlow.scale.setScalar(.001 + ease(e) * 6), null, .2);
+      tween(1.6, e => {
+        const k = ease(e);
+        giftHeart.position.y = .4 + k * 2.2;
+        giftHeart.scale.setScalar(.001 + k * .9);
+        giftHeart.rotation.y = k * Math.PI * 2;
+      }, null, .35);
+      setTimeout(() => burst(gift.position.clone().add(new V3(0, 2, 0)), 220, 8), 700);
+      setTimeout(next, 3000);
+    }
+
+    // =====================================================================
+    // 2. KUE
+    // =====================================================================
+    const cake = new THREE.Group();
+    cake.position.copy(ST.cake.pos).y -= .6;
+    {
+      const cream = new THREE.MeshStandardMaterial({ color: 0xfff1f5, roughness: .6 });
+      const add = (geo, mat, y) => { const m = new THREE.Mesh(geo, mat); m.position.y = y; cake.add(m); return m; };
+      add(new THREE.CylinderGeometry(2.5, 2.4, .14, 64), new THREE.MeshStandardMaterial({ color: 0xf5e8ee, metalness: .5, roughness: .25 }), .07);
+      add(new THREE.CylinderGeometry(1.9, 1.9, 1.15, 64), new THREE.MeshStandardMaterial({ color: 0xf7b6c9, roughness: .55 }), .72);
+      add(new THREE.CylinderGeometry(1.94, 1.94, .22, 64), cream, 1.2);
+      add(new THREE.CylinderGeometry(1.35, 1.35, .95, 64), new THREE.MeshStandardMaterial({ color: 0xe8588a, roughness: .5 }), 1.78);
+      add(new THREE.CylinderGeometry(1.39, 1.39, .2, 64), cream, 2.2);
+      // tetesan krim
+      const drip = new THREE.SphereGeometry(.13, 12, 10);
+      for (const [r, y, n] of [[1.93, 1.05, 26], [1.38, 2.07, 20]]) {
+        for (let i = 0; i < n; i++) {
+          const a = i / n * Math.PI * 2, m = new THREE.Mesh(drip, cream);
+          m.position.set(Math.cos(a) * r, y - (i % 3) * .06, Math.sin(a) * r);
+          m.scale.set(1, 1.5 + (i % 3) * .4, .7);
+          cake.add(m);
+        }
+      }
+      // mutiara emas
+      const pearl = new THREE.SphereGeometry(.07, 10, 8);
+      for (let i = 0; i < 30; i++) {
+        const a = i / 30 * Math.PI * 2, m = new THREE.Mesh(pearl, ribMat);
+        m.position.set(Math.cos(a) * 1.33, 2.32, Math.sin(a) * 1.33);
+        cake.add(m);
+      }
+    }
+    const candles = [];
+    const flameGeo = new THREE.SphereGeometry(.1, 16, 12);
+    const flameMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(1, .55, .15).multiplyScalar(4), toneMapped: false });
+    const flameCore = new THREE.MeshBasicMaterial({ color: new THREE.Color(1, .95, .7).multiplyScalar(5), toneMapped: false });
+    const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+    const candleCols = [0x8fe3cf, 0xffd98e, 0xc9a0ff, 0xff9cbc, 0xffffff];
+    for (let i = 0; i < C.jumlahLilin; i++) {
+      const a = i / C.jumlahLilin * Math.PI * 2 + .3, r = C.jumlahLilin > 1 ? .78 : 0;
+      const g = new THREE.Group();
+      g.position.set(Math.cos(a) * r, 2.3, Math.sin(a) * r);
+      const stick = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, .8, 16),
+        new THREE.MeshStandardMaterial({ color: candleCols[i % candleCols.length], roughness: .4 }));
+      stick.position.y = .4;
+      const flame = new THREE.Group();
+      flame.position.y = 1.0;
+      const outer = new THREE.Mesh(flameGeo, flameMat);
+      outer.scale.set(1, 1.9, 1);
+      const inner = new THREE.Mesh(flameGeo, flameCore);
+      inner.scale.set(.5, 1, .5);
+      inner.position.y = -.05;
+      flame.add(outer, inner);
+      const hit = new THREE.Mesh(new THREE.SphereGeometry(.38, 8, 6), hitMat);
+      hit.position.y = .9;
+      g.add(stick, flame, hit);
+      cake.add(g);
+      const c = { flame, hit, out: false, ph: rand(0, 6) };
+      hit.userData.candle = c;
+      candles.push(c);
+    }
+    const cakeLight = new THREE.PointLight(0xffa04d, 18, 9, 1.6);
+    cakeLight.position.y = 3.6;
+    cake.add(cakeLight);
+    scene.add(cake);
+    let cakeRot = 0, cakeVel = .25;
+
+    function smoke(pos) {
+      for (let k = 0; k < 6; k++) {
+        const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: dotTex, color: 0xcccccc, transparent: true, opacity: .5, depthWrite: false }));
+        m.position.copy(pos);
+        m.scale.setScalar(.15);
+        scene.add(m);
+        const dx = rand(-.3, .3);
+        tween(1.8, e => {
+          m.position.set(pos.x + dx * e, pos.y + e * 1.5, pos.z);
+          m.scale.setScalar(.15 + e * .7);
+          m.material.opacity = .5 * (1 - e);
+        }, () => { scene.remove(m); m.material.dispose(); }, k * .1);
+      }
+    }
+    const lit = () => candles.filter(c => !c.out);
+    function blow(c) {
+      if (!c || c.out) return;
+      c.out = true;
+      const f = c.flame, s0 = f.scale.x;
+      tween(.3, e => f.scale.setScalar(s0 * (1 - e)), () => f.visible = false);
+      smoke(f.getWorldPosition(new V3()));
+      if (lit().length === 0) celebrate();
+    }
+    let celebrated = false;
+    function celebrate() {
+      if (celebrated) return;
+      celebrated = true;
+      ["#cakeTitle", "#cakeHint", "#cakeActions"].forEach(s => $(s).classList.add("hidden"));
+      $("#hbd").textContent = `Selamat ulang tahun ke-${C.ultahKe}, ${C.nama}! 🎉`;
+      $("#hbd").classList.remove("hidden");
+      $("#cakeNext").classList.remove("hidden");
+      const top = cake.position.clone().add(new V3(0, 3, 0));
+      burst(top, 320, 10);
+      setTimeout(() => burst(top, 200, 8), 700);
+      setTimeout(() => burst(top, 150, 9), 1400);
+    }
+    $("#micBtn").onclick = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const an = ctx.createAnalyser();
+        an.fftSize = 512;
+        ctx.createMediaStreamSource(stream).connect(an);
+        const data = new Uint8Array(an.fftSize);
+        let loud = 0;
+        $("#micBtn").textContent = "🌬️ Tiup sekarang!";
+        const tick = () => {
+          an.getByteTimeDomainData(data);
+          let sum = 0;
+          for (const v of data) { const x = (v - 128) / 128; sum += x * x; }
+          const rms = Math.sqrt(sum / data.length);
+          if (rms > 0.15) { if (++loud > 5) { blow(lit()[0]); loud = 0; } }
+          else loud = Math.max(0, loud - 1);
+          if (lit().length) requestAnimationFrame(tick);
+          else { stream.getTracks().forEach(t => t.stop()); ctx.close(); }
+        };
+        tick();
+      } catch (e) {
+        $("#cakeHint").textContent = "Mic-nya nggak bisa dipakai, ketuk apinya aja ya 🕯️";
+        $("#micBtn").classList.add("hidden");
+      }
+    };
+
+    // =====================================================================
+    // 3. COUNTER — cincin emas & hati mengorbit
+    // =====================================================================
+    const orbit = new THREE.Group();
+    orbit.position.copy(ST.counter.pos).z -= 4;
+    {
+      const ringMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffd98e).multiplyScalar(1.4), toneMapped: false });
+      for (const [r, rx] of [[4.6, 1.2], [5.1, 1.9]]) {
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(r, .02, 8, 160), ringMat);
+        ring.rotation.x = rx;
+        orbit.add(ring);
+      }
+      for (let i = 0; i < 14; i++) {
+        const h = new THREE.Mesh(heartGeoLow, heartMat());
+        const a = i / 14 * Math.PI * 2;
+        h.position.set(Math.cos(a) * 4.6, Math.sin(a) * 4.6 * Math.cos(1.2), Math.sin(a) * 4.6 * Math.sin(1.2));
+        h.scale.setScalar(.22);
+        orbit.add(h);
+      }
+    }
+    scene.add(orbit);
+
+    // =====================================================================
+    // 4. CAROUSEL FOTO
+    // =====================================================================
+    const carousel = new THREE.Group();
+    carousel.position.copy(ST.timeline.pos);
+    scene.add(carousel);
+    const CR = 3.4, NK = C.kenangan.length, STEP = Math.PI * 2 / NK;
+    const photos = [];
+    const loader = new THREE.TextureLoader();
+    C.kenangan.forEach((k, i) => {
+      const a = i * STEP;
+      const holder = new THREE.Group();
+      holder.position.set(Math.sin(a) * CR, 0, Math.cos(a) * CR);
+      holder.rotation.y = a;
+      const item = new THREE.Group();
+      const mat = new THREE.MeshBasicMaterial({ color: 0xebebeb });
+      const photo = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
+      const frameMat = new THREE.MeshBasicMaterial({ color: 0xece4de, side: THREE.DoubleSide });
+      const frame = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), frameMat);
+      frame.position.z = -.01;
+      item.add(frame, photo);
+      holder.add(item);
+      carousel.add(holder);
+      const fit = aspect => {
+        const H = 2.9, W = H * aspect;
+        photo.scale.set(W, H, 1);
+        frame.scale.set(W + .2, H + .55, 1);
+        frame.position.y = -.16;
+      };
+      fit(.75);
+      if (k.foto) {
+        loader.load(BASE + k.foto, tex => {
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+          mat.map = tex;
+          mat.needsUpdate = true;
+          fit(tex.image.width / tex.image.height);
+        });
+      } else mat.color.set(0x8a3a67);
+      photo.userData.idx = frame.userData.idx = i;
+      photos.push({ item, mat, frameMat, photo, frame, ph: rand(0, 6) });
+    });
+    const floorGlow = new THREE.Mesh(new THREE.PlaneGeometry(12, 12),
+      new THREE.MeshBasicMaterial({ map: glowTex, color: new THREE.Color(0xff5c8a).multiplyScalar(.22), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+    floorGlow.rotation.x = -Math.PI / 2;
+    floorGlow.position.y = -2.2;
+    carousel.add(floorGlow);
+
+    let carRot = 0, carTarget = 0, carVel = 0, capIdx = -1;
+    const frontIdx = () => ((Math.round(-carRot / STEP) % NK) + NK) % NK;
+    function gotoPhoto(i) { carTarget = carRot + wrapA(-i * STEP - carRot); }
+    $("#prevB").onclick = () => gotoPhoto(frontIdx() - 1);
+    $("#nextB").onclick = () => gotoPhoto(frontIdx() + 1);
+    C.kenangan.forEach(() => $("#dots").appendChild(document.createElement("span")));
+    function updateCaption() {
+      const i = frontIdx();
+      if (i === capIdx) return;
+      capIdx = i;
+      const cap = $("#caption");
+      cap.classList.add("swap");
+      setTimeout(() => {
+        $("#capT").textContent = C.kenangan[i].judul;
+        $("#capP").textContent = C.kenangan[i].cerita;
+        cap.classList.remove("swap");
+      }, 200);
+      [...$("#dots").children].forEach((d, j) => d.classList.toggle("on", j === i));
+    }
+    function updateCarousel(t, dt) {
+      if (!drag.on || drag.scene !== "timeline") {
+        carRot += (carTarget - carRot) * Math.min(1, dt * 5);
+      }
+      carousel.rotation.y = carRot;
+      photos.forEach((p, i) => {
+        const ang = wrapA(i * STEP + carRot), c = 1 - Math.min(1, Math.abs(ang) / STEP);
+        p.item.visible = Math.cos(ang) > -.2;
+        p.item.rotation.y = -ang * .45;
+        p.item.scale.setScalar(.82 + .3 * c);
+        p.item.position.y = Math.sin(t * .8 + p.ph) * .08;
+        p.mat.color.setScalar(.35 + .57 * c);
+        p.frameMat.color.setHex(0xece4de).multiplyScalar(.2 + .8 * c);
+      });
+      updateCaption();
+    }
+
+    // =====================================================================
+    // 5. REASONS — hati per alasan, menyala saat kartunya dibuka
+    // =====================================================================
+    const reasonHearts = [];
+    {
+      const g = new THREE.Group();
+      g.position.copy(ST.reasons.pos);
+      C.alasan.forEach((_, i) => {
+        const m = heartMat();
+        m.emissiveIntensity = .08;
+        m.color.set(0x7a3a5a);
+        const h = new THREE.Mesh(heartGeoLow, m);
+        const a = i / C.alasan.length * Math.PI * 2;
+        h.position.set(Math.cos(a) * 4.2, Math.sin(a) * 3.4, -1.5);
+        h.scale.setScalar(.55);
+        g.add(h);
+        reasonHearts.push(h);
+      });
+      scene.add(g);
+    }
+    function lightReason(i) {
+      const h = reasonHearts[i];
+      if (!h) return;
+      tween(.9, e => {
+        h.material.emissiveIntensity = .08 + e * 1.4;
+        h.material.color.lerpColors(new THREE.Color(0x7a3a5a), new THREE.Color(0xff4f86), e);
+        h.scale.setScalar(.55 + Math.sin(e * Math.PI) * .35 + e * .1);
+      });
+      burst(h.getWorldPosition(new V3()), 40, 4);
+    }
+
+    // =====================================================================
+    // 6-7. LETTER & FINAL
+    // =====================================================================
+    addSparkles(ST.letter.pos, 260, 7, 10, 0xffd98e);
+    addSparkles(ST.final.pos, 320, 5, 9, 0xff9cbc);
+    const finalHeart = new THREE.Mesh(heartGeo, heartMat());
+    finalHeart.position.copy(ST.final.pos);
+    const finalGlow = glowSprite(new THREE.Color(0xff5c8a), 9);
+    finalGlow.position.copy(ST.final.pos).z -= 1;
+    const finalRing = new THREE.Group();
+    finalRing.position.copy(ST.final.pos);
+    for (let i = 0; i < 10; i++) {
+      const h = new THREE.Mesh(heartGeoLow, heartMat());
+      const a = i / 10 * Math.PI * 2;
+      h.position.set(Math.cos(a) * 2.6, 0, Math.sin(a) * 2.6);
+      h.scale.setScalar(.2);
+      finalRing.add(h);
+    }
+    scene.add(finalHeart, finalGlow, finalRing);
+
+    // =====================================================================
+    // KAMERA: terbang antar stasiun + parallax jari/mouse/gyro
+    // =====================================================================
+    const cam = { from: new V3(), fromLook: new V3(), to: new V3(), toLook: new V3(), base: new V3(), look: new V3(), t: 1, dur: 2.4 };
+    let curKey = ORDER[0];
+    function flyTo(k, instant) {
+      curKey = k;
+      const v = stationView(k);
+      cam.from.copy(cam.base);
+      cam.fromLook.copy(cam.look);
+      cam.to.copy(v.pos);
+      cam.toLook.copy(v.look);
+      if (instant) { cam.base.copy(v.pos); cam.look.copy(v.look); cam.t = 1; }
+      else cam.t = 0;
+    }
+    const par = { x: 0, y: 0, tx: 0, ty: 0 };
+    addEventListener("pointermove", e => {
+      if (e.pointerType !== "mouse" && gyroOn) return;
+      par.tx = (e.clientX / innerWidth - .5) * 2;
+      par.ty = (e.clientY / innerHeight - .5) * 2;
+    });
+    let gyroOn = false, gyroBase = null;
+    function addGyro() {
+      addEventListener("deviceorientation", e => {
+        if (e.gamma == null) return;
+        gyroOn = true;
+        gyroBase ??= e.beta;
+        par.tx = THREE.MathUtils.clamp(e.gamma / 25, -1, 1);
+        par.ty = THREE.MathUtils.clamp((e.beta - gyroBase) / 25, -1, 1);
+      });
+    }
+    let gyroAsked = false;
+    function enableGyro() {
+      if (gyroAsked) return;
+      gyroAsked = true;
+      const D = window.DeviceOrientationEvent;
+      if (D && typeof D.requestPermission === "function") D.requestPermission().then(s => s === "granted" && addGyro()).catch(() => { });
+      else if (D) addGyro();
+    }
+    function updateCamera(dt) {
+      if (cam.t < 1) {
+        cam.t = Math.min(1, cam.t + dt / cam.dur);
+        const e = ease(cam.t);
+        cam.base.lerpVectors(cam.from, cam.to, e);
+        cam.base.y += Math.sin(Math.PI * e) * 2.5;
+        cam.base.x += Math.sin(Math.PI * e) * 1.5;
+        cam.look.lerpVectors(cam.fromLook, cam.toLook, e);
+      }
+      par.x += (par.tx - par.x) * Math.min(1, dt * 3);
+      par.y += (par.ty - par.y) * Math.min(1, dt * 3);
+      const amp = cam.base.distanceTo(cam.look) * .07;
+      camera.position.copy(cam.base).add(new V3(par.x * amp, -par.y * amp * .7, 0));
+      camera.lookAt(cam.look);
+      keyLight.position.copy(camera.position).add(new V3(4, 6, 2));
+      keyLight.target.position.copy(cam.look);
+    }
+
+    // =====================================================================
+    // INPUT 3D: ketuk & geser di kanvas
+    // =====================================================================
+    const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+    const drag = { on: false, scene: null, x: 0, sx: 0, sy: 0, t: 0, moved: false };
+    const canvas = $("#gl");
+    canvas.addEventListener("pointerdown", e => {
+      Object.assign(drag, { on: true, scene: curKey, x: e.clientX, sx: e.clientX, sy: e.clientY, t: performance.now(), moved: false });
+      carVel = 0;
+      canvas.setPointerCapture?.(e.pointerId);
+    });
+    canvas.addEventListener("pointermove", e => {
+      if (!drag.on) return;
+      const dx = e.clientX - drag.x;
+      drag.x = e.clientX;
+      if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 8) drag.moved = true;
+      if (drag.scene === "timeline") { carRot += dx * .006; carVel = dx * .006; }
+      if (drag.scene === "cake") { cakeRot += dx * .01; cakeVel = dx * .6; }
+    });
+    const endDrag = e => {
+      if (!drag.on) return;
+      drag.on = false;
+      if (drag.scene === "timeline" && drag.moved) {
+        const aim = carRot + carVel * 8;
+        carTarget = Math.round(aim / STEP) * STEP;
+      }
+      if (!drag.moved && performance.now() - drag.t < 600) tap(e.clientX, e.clientY);
+    };
+    canvas.addEventListener("pointerup", endDrag);
+    canvas.addEventListener("pointercancel", () => drag.on = false);
+
+    function pick(x, y, objs) {
+      ndc.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      return ray.intersectObjects(objs, true)[0];
+    }
+    function tap(x, y) {
+      if (cam.t < 1) return;
+      if (curKey === "envelope") return openGift();
+      if (curKey === "cake") {
+        const hit = pick(x, y, candles.filter(c => !c.out).map(c => c.hit));
+        if (hit) blow(hit.object.userData.candle);
+      }
+      if (curKey === "timeline") {
+        const hit = pick(x, y, photos.flatMap(p => [p.photo, p.frame]));
+        if (hit) gotoPhoto(hit.object.userData.idx);
+      }
+      if (curKey === "lock" || curKey === "final") burst(pick(x, y, [lockHeart, finalHeart])?.point ?? ST[curKey].pos, 30, 4);
+    }
+
+    // =====================================================================
+    // ALUR SCENE
+    // =====================================================================
+    let idx = -1;
+    const hooks = {};
+    function go(i) {
+      if (idx >= 0) $("#s-" + ORDER[idx]).classList.remove("active");
+      const first = idx < 0;
+      idx = i;
+      const k = ORDER[idx];
+      flyTo(k, first);
+      document.body.classList.toggle("grab", k === "cake" || k === "timeline");
+      const el = $("#s-" + k);
+      setTimeout(() => { el.scrollTop = 0; el.classList.add("active"); }, first ? 0 : 1300);
+      hooks[k]?.();
+    }
+    const next = () => go(idx + 1);
+    document.querySelectorAll("[data-next]").forEach(b => b.addEventListener("click", next));
+
+    // ---------- musik ----------
+    const music = $("#music");
+    if (C.lagu) {
+      music.src = BASE + C.lagu;
+      music.addEventListener("error", () => $("#musicBtn").classList.add("hidden"));
+    }
+    function playMusic() {
+      if (!C.lagu) return;
+      music.play().then(() => $("#musicBtn").classList.remove("hidden")).catch(() => { });
+    }
+    $("#musicBtn").onclick = () => {
+      if (music.paused) { music.play(); $("#musicBtn").textContent = "🎵"; }
+      else { music.pause(); $("#musicBtn").textContent = "🔇"; }
+    };
+
+    // ---------- lock ----------
+    function tryPw() {
+      const norm = v => v.trim().toLowerCase().replace(/\s+/g, "");
+      enableGyro();
+      if (norm($("#pw").value) === norm(C.password)) {
+        playMusic();
+        burst(lockHeart.position, 120, 7);
+        $("#pw").blur();
+        next();
+      } else {
+        const b = $(".lock-box");
+        b.classList.remove("shake");
+        void b.offsetWidth;
+        b.classList.add("shake");
+      }
+    }
+    $("#pwBtn").onclick = tryPw;
+    $("#pw").addEventListener("keydown", e => e.key === "Enter" && tryPw());
+
+    // ---------- counter ----------
+    const jadian = new Date(C.tanggalJadian + "T00:00:00");
+    $("#jadianTxt").textContent = jadian.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+    let counterTimer;
+    hooks.counter = () => {
+      const upd = () => {
+        const s = Math.max(0, Math.floor((Date.now() - jadian) / 1000));
+        $("#cD").textContent = Math.floor(s / 86400).toLocaleString("id-ID");
+        $("#cH").textContent = Math.floor(s % 86400 / 3600);
+        $("#cM").textContent = Math.floor(s % 3600 / 60);
+        $("#cS").textContent = s % 60;
+      };
+      upd();
+      clearInterval(counterTimer);
+      counterTimer = setInterval(upd, 1000);
+    };
+
+    // ---------- reasons ----------
+    C.alasan.forEach((a, i) => {
+      const c = document.createElement("div");
+      c.className = "card";
+      c.innerHTML = `<div class="card-in"><div class="face front">💗<small>#${i + 1}</small></div><div class="face back"></div></div>`;
+      c.querySelector(".back").textContent = a;
+      c.onclick = () => {
+        if (c.classList.contains("flip")) return;
+        c.classList.add("flip");
+        lightReason(i);
+      };
+      $("#reasons").appendChild(c);
+    });
+
+    // ---------- letter ----------
+    let typing, typed = false;
+    function finishLetter() {
+      clearInterval(typing);
+      $("#letterText").textContent = C.surat;
+      $("#sign").classList.add("show");
+      $("#skipHint").classList.add("hidden");
+      $("#letterNext").classList.remove("hidden");
+      typed = true;
+    }
+    hooks.letter = () => {
+      if (typed) return;
+      setTimeout(() => {
+        if (typed) return;
+        let i = 0;
+        const el = $("#letterText"), sc = $("#s-letter");
+        typing = setInterval(() => {
+          el.textContent = C.surat.slice(0, ++i);
+          if (sc.scrollHeight > sc.clientHeight) sc.scrollTop = sc.scrollHeight;
+          if (i >= C.surat.length) finishLetter();
+        }, 38);
+      }, 1300);
+    };
+    $("#paper").addEventListener("click", () => !typed && finishLetter());
+
+    // ---------- final ----------
+    hooks.final = () => {
+      setTimeout(() => {
+        burst(finalHeart.position, 320, 10);
+        setInterval(() => burst(finalHeart.position.clone().add(new V3(rand(-2, 2), rand(0, 2), 0)), 60, 6), 2600);
+      }, 1500);
+    };
+
+    // =====================================================================
+    // LOOP
+    // =====================================================================
+    function resize() {
+      const w = innerWidth, h = innerHeight;
+      renderer.setSize(w, h, false);
+      composer.setPixelRatio(renderer.getPixelRatio());
+      composer.setSize(w, h);
+      camera.aspect = w / h;
+      // layar potret: sedikit lebih lebar supaya objek tidak terlalu kecil
+      camera.fov = w < h ? 58 : 50;
+      camera.updateProjectionMatrix();
+      const v = stationView(curKey);
+      cam.to.copy(v.pos);
+      cam.toLook.copy(v.look);
+      if (cam.t >= 1) { cam.base.copy(v.pos); cam.look.copy(v.look); }
+    }
+    addEventListener("resize", resize);
+
+    const clock = new THREE.Clock();
+    let frames = 0;
+    renderer.setAnimationLoop(() => {
+      const dt = Math.min(clock.getDelta(), .05), t = clock.elapsedTime;
+      updateCamera(dt);
+      updateTweens(dt);
+      updateFloaters(t);
+      updateSparkles(dt);
+      updateConfetti(dt);
+
+      const beat = 1 + Math.max(0, Math.sin(t * 5)) ** 8 * .12;
+      lockHeart.rotation.y = Math.sin(t * .8) * .6;
+      lockHeart.scale.setScalar(1.1 * beat);
+      lockHeart.position.y = ST.lock.pos.y + Math.sin(t * 1.2) * .12;
+
+      if (!giftOpen) {
+        gift.rotation.y = t * .4;
+        gift.position.y = ST.envelope.pos.y + Math.sin(t * 1.5) * .12;
+      } else giftHeart.rotation.y += dt;
+
+      if (!(drag.on && drag.scene === "cake")) {
+        cakeVel += (.25 - cakeVel) * Math.min(1, dt * 1.5);
+        cakeRot += cakeVel * dt;
+      }
+      cake.rotation.y = cakeRot;
+      candles.forEach(c => {
+        if (c.out) return;
+        c.flame.scale.set(1 + Math.sin(t * 17 + c.ph) * .08, 1 + Math.sin(t * 23 + c.ph) * .15, 1);
+      });
+      cakeLight.intensity = 18 * lit().length / Math.max(1, candles.length) * (1 + Math.sin(t * 20) * .06);
+
+      orbit.rotation.y = t * .25;
+      orbit.rotation.z = Math.sin(t * .3) * .2;
+      reasonHearts.forEach((h, i) => h.rotation.y = Math.sin(t + i) * .5);
+
+      finalHeart.scale.setScalar(1.25 * beat);
+      finalHeart.rotation.y = Math.sin(t * .6) * .5;
+      finalRing.rotation.y = t * .5;
+      finalRing.children.forEach((h, i) => { h.rotation.y = t * 2 + i; h.position.y = Math.sin(t * 1.5 + i) * .4; });
+
+      updateCarousel(t, dt);
+      composer.render();
+      if (++frames === 2) $("#loading").classList.add("gone");
+    });
+
+    resize();
+    // ?s=cake dst. untuk lompat langsung ke satu scene (buat ngetes)
+    go(Math.max(0, ORDER.indexOf(new URLSearchParams(location.search).get("s"))));
+  </script>
+</body>
+
+</html>
